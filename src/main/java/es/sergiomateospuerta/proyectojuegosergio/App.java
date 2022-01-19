@@ -14,10 +14,12 @@ import javafx.util.Duration;
 public class App extends Application {
   
     Pane root = new Pane(); // PANEL PRINCIPAL QUE CONTENDRÁ LOS ELEMENTOS DE LA PANTALLA
-    ImageView imgView;
+    ImageView fondo1;
+    ImageView fondo2;
     final int SCENE_TAM_X = 720; // TAMAÑO X DE LA VENTANA
     final int SCENE_TAM_Y = 360; // TAMAÑO Y DE LA VENTANA
-    int backgroundPositionX = 0; // POSICION X DE LA IMAGEN DE FONDO
+    int background1PositionX = 0; // POSICION X DE LA IMAGEN DE FONDO
+    int background2PositionX = 720; // POSICION X DE LA IMAGEN DE FONDO
     
     @Override
       public void start(Stage stage) {
@@ -28,14 +30,31 @@ public class App extends Application {
           stage.show();
           stage.setResizable(false); // BLOQUEAR REESCALADO DE LA VENTANA
           Image img = new Image(getClass().getResourceAsStream("/images/FondoLejos.png")); // CARGA LA IMAGEN DE FONDO
-          imgView = new ImageView(img); // CREA EL OBJETO IMAGENVIEW
-          root.getChildren().add(imgView); // AÑADE EL OBJETO IMAGENVIEW A LA PANTALLA
-         
+          fondo1 = new ImageView(img); // CREA EL OBJETO fondo1
+          fondo2 = new ImageView(img); // CREA EL OBJETO fondo2
+          root.getChildren().add(fondo1); // AÑADE EL OBJETO fondo1 A LA PANTALLA
+          root.getChildren().add(fondo2); // AÑADE EL OBJETO fondo2 A LA PANTALLA
+          
+          ////////////////////////////////////////////////////////////
+          // IGUALAMOS LA POSICION INICIAL DE LAS IMAGENES DE FONDO //
+          ////////////////////////////////////////////////////////////
+          
+          fondo1.setLayoutX(background1PositionX);
+          fondo2.setLayoutX(background2PositionX);
+          
+          ////////////////////////////////////////////////////////////
           
           Timeline fondoScroll = new Timeline(
                   new KeyFrame(Duration.seconds(0.017), (ActionEvent ae) -> {
-                      backgroundPositionX = backgroundPositionX -1;
-                      imgView.setLayoutX(backgroundPositionX);
+                      background1PositionX = background1PositionX -1;
+                      fondo1.setLayoutX(background1PositionX);
+                      background2PositionX = background2PositionX -1;
+                      fondo2.setLayoutX(background2PositionX);
+                      if (background1PositionX == -720) {
+                          background1PositionX = 720;
+                      } else if (background2PositionX == -720) {
+                          background2PositionX = 720;
+                      }
                   })
           );
           
