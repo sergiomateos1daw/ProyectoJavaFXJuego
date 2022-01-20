@@ -16,6 +16,7 @@ public class App extends Application {
     Pane root = new Pane(); // PANEL PRINCIPAL QUE CONTENDRÁ LOS ELEMENTOS DE LA PANTALLA
     ImageView fondo1;
     ImageView fondo2;
+    ImageView avion;
     final int SCENE_TAM_X = 720; // TAMAÑO X DE LA VENTANA
     final int SCENE_TAM_Y = 360; // TAMAÑO Y DE LA VENTANA
     int background1PositionX = 0; // POSICION X DE LA IMAGEN DE FONDO
@@ -29,11 +30,14 @@ public class App extends Application {
           stage.setScene(scene);
           stage.show();
           stage.setResizable(false); // BLOQUEAR REESCALADO DE LA VENTANA
-          Image img = new Image(getClass().getResourceAsStream("/images/FondoLejos.png")); // CARGA LA IMAGEN DE FONDO
-          fondo1 = new ImageView(img); // CREA EL OBJETO fondo1
-          fondo2 = new ImageView(img); // CREA EL OBJETO fondo2
+          Image fondoImg = new Image(getClass().getResourceAsStream("/images/FondoLejos.png")); // CARGA LA IMAGEN DE FONDO
+          Image avionImg = new Image(getClass().getResourceAsStream("/images/avion.png")); // CARGA LA IMAGEN AVION
+          fondo1 = new ImageView(fondoImg); // CREA EL OBJETO fondo1
+          fondo2 = new ImageView(fondoImg); // CREA EL OBJETO fondo2
+          avion = new ImageView(avionImg); // CREA EL OBJETO avion
           root.getChildren().add(fondo1); // AÑADE EL OBJETO fondo1 A LA PANTALLA
           root.getChildren().add(fondo2); // AÑADE EL OBJETO fondo2 A LA PANTALLA
+          root.getChildren().add(avion); // AÑADE EL OBJETO fondo2 A LA PANTALLA
           
           ////////////////////////////////////////////////////////////
           // IGUALAMOS LA POSICION INICIAL DE LAS IMAGENES DE FONDO //
@@ -44,6 +48,7 @@ public class App extends Application {
           
           ////////////////////////////////////////////////////////////
           
+
           Timeline fondoScroll = new Timeline(
                   new KeyFrame(Duration.seconds(0.017), (ActionEvent ae) -> {
                       background1PositionX = background1PositionX -1;
