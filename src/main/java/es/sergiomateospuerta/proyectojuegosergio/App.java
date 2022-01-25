@@ -5,11 +5,15 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -19,10 +23,20 @@ public class App extends Application {
     ImageView fondo1;
     ImageView fondo2;
     ImageView avion;
+    Rectangle rectAvion = new Rectangle(53, 33);
+    Group groupAvion = new Group();
     ImageView misil1;
+    Rectangle rectMisil1 = new Rectangle(53, 33);
+    Group groupMisil1 = new Group();
     ImageView misil2;
+    Rectangle rectMisil2 = new Rectangle(53, 33);
+    Group groupMisil2 = new Group();
     ImageView misil3;
+    Rectangle rectMisil3 = new Rectangle(53, 33);
+    Group groupMisil3 = new Group();
     ImageView coin;
+    Rectangle rectCoin = new Rectangle(53, 33);
+    Group groupCoin = new Group();
     final int SCENE_TAM_X = 720; // TAMAÑO X DE LA VENTANA
     final int SCENE_TAM_Y = 360; // TAMAÑO Y DE LA VENTANA
     int background1PositionX = 0; // POSICION X DE LA IMAGEN DE FONDO
@@ -46,7 +60,9 @@ public class App extends Application {
     int numAleatorio2 = 0;
     int numAleatorio3 = 0;
     int numAleatorio4 = 0;
-    
+    int rondas = 0;
+    double velocidadMisiles = 0.005;
+    int puntos = 0;
     
     
     @Override
@@ -70,11 +86,27 @@ public class App extends Application {
           coin = new ImageView(coinImg); // CREA EL OBJETO coin
           root.getChildren().add(fondo1); // AÑADE EL OBJETO fondo1 A LA PANTALLA
           root.getChildren().add(fondo2); // AÑADE EL OBJETO fondo2 A LA PANTALLA
-          root.getChildren().add(avion); // AÑADE EL OBJETO avion A LA PANTALLA
-          root.getChildren().add(misil1); // AÑADE EL OBJETO misil1 A LA PANTALLA
-          root.getChildren().add(misil2); // AÑADE EL OBJETO misil2 A LA PANTALLA
-          root.getChildren().add(misil3); // AÑADE EL OBJETO misil3 A LA PANTALLA
-          root.getChildren().add(coin); // AÑADE EL OBJETO coin A LA PANTALLA
+          root.getChildren().add(groupAvion); // AÑADE EL OBJETO avion A LA PANTALLA
+          root.getChildren().add(groupMisil1); // AÑADE EL OBJETO misil1 A LA PANTALLA
+          root.getChildren().add(groupMisil2); // AÑADE EL OBJETO misil2 A LA PANTALLA
+          root.getChildren().add(groupMisil3); // AÑADE EL OBJETO misil3 A LA PANTALLA
+          root.getChildren().add(groupCoin); // AÑADE EL OBJETO coin A LA PANTALLA
+          groupAvion.getChildren().addAll(avion,rectAvion);
+          groupMisil1.getChildren().addAll(misil1,rectMisil1);
+          groupMisil2.getChildren().addAll(misil2,rectMisil2);
+          groupMisil3.getChildren().addAll(misil3,rectMisil3);
+          groupCoin.getChildren().addAll(coin,rectCoin);
+          //rectAvion.setVisible(false);
+          //rectMisil1.setVisible(false);
+          //rectMisil2.setVisible(false);
+          //rectMisil3.setVisible(false);
+          //rectCoin.setVisible(false);
+          rectAvion.setFill(Color.TRANSPARENT);
+          rectMisil1.setFill(Color.TRANSPARENT);
+          rectMisil2.setFill(Color.TRANSPARENT);
+          rectMisil3.setFill(Color.TRANSPARENT);
+          rectCoin.setFill(Color.TRANSPARENT);
+          
           
           ////////////////////////////////////////////////////////////
           // IGUALAMOS LA POSICION INICIAL DE LAS IMAGENES DEL JUEGO //
@@ -82,20 +114,18 @@ public class App extends Application {
           
           fondo1.setLayoutX(background1PositionX);
           fondo2.setLayoutX(background2PositionX);
-          avion.setLayoutX(avionPositionX);
-          avion.setLayoutY(avionPositionY);
-          misil1.setLayoutX(misil1PositionX);
-          misil1.setLayoutY(misil1PositionY);
-          misil2.setLayoutX(misil2PositionX);
-          misil2.setLayoutY(misil2PositionY);
-          misil3.setLayoutX(misil3PositionX);
-          misil3.setLayoutY(misil3PositionY);
-          coin.setLayoutX(coinPositionX);
-          coin.setLayoutY(coinPositionY);
+          groupAvion.setLayoutX(avionPositionX);
+          groupAvion.setLayoutY(avionPositionY);
+          groupMisil1.setLayoutX(misil1PositionX);
+          groupMisil1.setLayoutY(misil1PositionY);
+          groupMisil2.setLayoutX(misil2PositionX);
+          groupMisil2.setLayoutY(misil2PositionY);
+          groupMisil3.setLayoutX(misil3PositionX);
+          groupMisil3.setLayoutY(misil3PositionY);
+          groupCoin.setLayoutX(coinPositionX);
+          groupCoin.setLayoutY(coinPositionY);
           
           ////////////////////////////////////////////////////////////
-          
-          
 
           Timeline fondoScroll = new Timeline(
                   new KeyFrame(Duration.seconds(0.017), (ActionEvent ae) -> {
@@ -123,13 +153,13 @@ public class App extends Application {
                                 case UP: // PULSAR TECLA ARRIBA
                                     if (avionPositionY > 50){
                                         avionPositionY = avionPositionY - 50;
-                                        avion.setLayoutY(avionPositionY);
+                                        groupAvion.setLayoutY(avionPositionY);
                                     }
                                     break;
                                 case DOWN: // PULSAR TECLA ABAJO
                                     if (avionPositionY < 250){
                                         avionPositionY = avionPositionY + 50;
-                                        avion.setLayoutY(avionPositionY);
+                                        groupAvion.setLayoutY(avionPositionY);
                                     }
                                     break;
                             }
@@ -143,19 +173,19 @@ public class App extends Application {
           movimientoAvion.play(); // EJECUTAR EL TIMELINE
           
           Timeline movimientoMisiles = new Timeline(
-                  new KeyFrame(Duration.seconds(0.005), (ActionEvent ae) -> {
+                  new KeyFrame(Duration.seconds(velocidadMisiles), (ActionEvent ae) -> {
                       misil1PositionX = misil1PositionX -1;
-                      misil1.setLayoutX(misil1PositionX);
+                      groupMisil1.setLayoutX(misil1PositionX);
                       misil2PositionX = misil2PositionX -1;
-                      misil2.setLayoutX(misil2PositionX);
+                      groupMisil2.setLayoutX(misil2PositionX);
                       misil3PositionX = misil3PositionX -1;
-                      misil3.setLayoutX(misil3PositionX);
+                      groupMisil3.setLayoutX(misil3PositionX);
                       coinPositionX = coinPositionX -1;
-                      coin.setLayoutX(coinPositionX);
-                      misil1.setLayoutY(misil1PositionY);
-                      misil2.setLayoutY(misil2PositionY);
-                      misil3.setLayoutY(misil3PositionY);
-                      coin.setLayoutY(coinPositionY);
+                      groupCoin.setLayoutX(coinPositionX);
+                      groupMisil1.setLayoutY(misil1PositionY);
+                      groupMisil2.setLayoutY(misil2PositionY);
+                      groupMisil3.setLayoutY(misil3PositionY);
+                      groupCoin.setLayoutY(coinPositionY);
                       if (misil1PositionX == -40){
                           misil1PositionX = 730;
                           numAleatorio1= (int) (Math.random() * 5) + 1;
@@ -334,9 +364,47 @@ public class App extends Application {
                       }
                   })
           );
-          
           movimientoMisiles.setCycleCount(Timeline.INDEFINITE); // DEFINIR QUE SE EJECUTE INDEFINIDAMENTE
           movimientoMisiles.play(); // EJECUTAR EL TIMELINE
+          
+          
+          Timeline detectarColision = new Timeline(
+                  new KeyFrame(Duration.seconds(0.017), (ActionEvent ae) -> {
+                      Shape colisionMisil1 = Shape.intersect(rectAvion, rectMisil1);
+                      boolean colisionVaciaMisil1 = colisionMisil1.getBoundsInLocal().isEmpty();
+                      if(colisionVaciaMisil1 == false){
+                          movimientoMisiles.stop();
+                          System.out.println("Has chocado con misil1");
+                          
+                      }
+                      Shape colisionMisil2 = Shape.intersect(rectAvion, rectMisil2);
+                      boolean colisionVaciaMisil2 = colisionMisil2.getBoundsInLocal().isEmpty();
+                      if(colisionVaciaMisil2 == false){
+                          movimientoMisiles.stop();
+                          System.out.println("Has chocado con misil2");
+                          
+                      }
+                      Shape colisionMisil3 = Shape.intersect(rectAvion, rectMisil3);
+                      boolean colisionVaciaMisil3 = colisionMisil3.getBoundsInLocal().isEmpty();
+                      if(colisionVaciaMisil3 == false){
+                          movimientoMisiles.stop();
+                          System.out.println("Has chocado con misil3");
+                          
+                      }
+                      Shape colisionCoin = Shape.intersect(rectAvion, rectCoin);
+                      boolean colisionVaciaCoin = colisionCoin.getBoundsInLocal().isEmpty();
+                      if(colisionVaciaCoin == false){
+                          groupCoin.
+                          puntos++;
+                          System.out.println("Tienes "+puntos+" puntos");
+                          
+                      }
+                      
+                  })
+          );
+          
+          detectarColision.setCycleCount(Timeline.INDEFINITE); // DEFINIR QUE SE EJECUTE INDEFINIDAMENTE
+          detectarColision.play(); // EJECUTAR EL TIMELINE
           
       }
       
