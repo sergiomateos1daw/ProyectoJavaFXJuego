@@ -509,7 +509,7 @@ public class App extends Application {
                           public void handle(KeyEvent event) {
                               switch (event.getCode()){
                                   case ENTER: // PULSAR TECLA ENTER
-                                      System.out.println("PULSAS ENTER");
+                                      System.out.println("PULSAS ENTER ");
                                       break;
                                   case ESCAPE: // PULSAR TECLA ESCAPE
                                       System.out.println("PULSAS ESCAPE");
