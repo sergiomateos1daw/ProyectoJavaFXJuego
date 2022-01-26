@@ -47,24 +47,26 @@ public class App extends Application {
     ImageView explosion;
     Label labelPuntos;
     Label labelPuntosFinal;
+    Label labelIndicadoresReinicio;
+    
     //////////////////////////////
     ///// VARIABLES //////////////
     final int SCENE_TAM_X = 720; // TAMAÑO X DE LA VENTANA
     final int SCENE_TAM_Y = 360; // TAMAÑO Y DE LA VENTANA
-    int background1PositionX = 0; // POSICION X DE LA IMAGEN DE FONDO
-    int background2PositionX = 720; // POSICION X DE LA IMAGEN DE FONDO2
-    int avionPositionX = 50; // POSICION X DE LA IMAGEN AVION
-    int avionPositionY = 150; // POSICION Y DE LA IMAGEN AVION
-    int misil1PositionX = 1000; // POSICION X DE LA IMAGEN MISIL1
-    int misil1PositionY = 250; // POSICION Y DE LA IMAGEN MISIL1
-    int misil2PositionX = 750; // POSICION X DE LA IMAGEN MISIL2
-    int misil2PositionY = 150; // POSICION Y DE LA IMAGEN MISIL2
-    int misil3PositionX = 1200; // POSICION X DE LA IMAGEN MISIL3
-    int misil3PositionY = 50; // POSICION Y DE LA IMAGEN MISIL3
-    int coinPositionX = 2000; // POSICION X DE LA IMAGEN COIN
-    int coinPositionY = 100; // POSICION Y DE LA IMAGEN COIN
-    int explosionPositionX = 2000; // POSICION X DE LA IMAGEN COIN
-    int explosionPositionY = 100; // POSICION Y DE LA IMAGEN COIN
+    double background1PositionX = 0; // POSICION X DE LA IMAGEN DE FONDO
+    double background2PositionX = 720; // POSICION X DE LA IMAGEN DE FONDO2
+    double avionPositionX = 50; // POSICION X DE LA IMAGEN AVION
+    double avionPositionY = 150; // POSICION Y DE LA IMAGEN AVION
+    double misil1PositionX = 1000; // POSICION X DE LA IMAGEN MISIL1
+    double misil1PositionY = 250; // POSICION Y DE LA IMAGEN MISIL1
+    double misil2PositionX = 750; // POSICION X DE LA IMAGEN MISIL2
+    double misil2PositionY = 150; // POSICION Y DE LA IMAGEN MISIL2
+    double misil3PositionX = 1200; // POSICION X DE LA IMAGEN MISIL3
+    double misil3PositionY = 50; // POSICION Y DE LA IMAGEN MISIL3
+    double coinPositionX = 2000; // POSICION X DE LA IMAGEN COIN
+    double coinPositionY = 100; // POSICION Y DE LA IMAGEN COIN
+    double explosionPositionX = 2000; // POSICION X DE LA IMAGEN COIN
+    double explosionPositionY = 100; // POSICION Y DE LA IMAGEN COIN
     boolean carril1 = true; // Y = 50
     boolean carril2 = false; // Y = 100
     boolean carril3 = true; // Y = 150
@@ -75,14 +77,17 @@ public class App extends Application {
     int numAleatorio3 = 0;
     int numAleatorio4 = 0;
     int rondas = 0;
-    int velocidadMisiles = 1;
+    double velocidadMisiles = 1;
     int puntos = 0;
     boolean reinicio = false;
+    boolean borrarTextos = false;
+    int confirmacionBorrado = 0;
+    
     //////////////////////////////
     //////////////////////////////
     
     private void crearLabelPuntos(){
-        
+        labelIndicadoresReinicio = new Label("Pulsa ENTER para jugar otra vez, o pulsa ESC para salir");
         labelPuntos = new Label("Coins: "+puntos);
         Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 25);
         labelPuntos.setFont(font);
@@ -105,7 +110,60 @@ public class App extends Application {
         labelPuntos.setText("");
         labelPuntos.setText("Coins: "+puntos);
     }
-    
+   private void reiniciarPartida(){
+        // ESTABLECE A CADA VARIABLE SU VALOR POR DEFECTO //
+        avionPositionX = 50;
+        avionPositionY = 150;
+        misil1PositionX = 1000;
+        misil1PositionY = 250;
+        misil2PositionX = 750;
+        misil2PositionY = 150;
+        misil3PositionX = 1200;
+        misil3PositionY = 50;
+        coinPositionX = 2000;
+        coinPositionY = 100;
+        explosionPositionX = 2000;
+        explosionPositionY = 100;
+        carril1 = true;
+        carril2 = false;
+        carril3 = true;
+        carril4 = false;
+        carril5 = true;
+        numAleatorio1 = 0;
+        numAleatorio2 = 0;
+        numAleatorio3 = 0;
+        numAleatorio4 = 0;
+        rondas = 0;
+        velocidadMisiles = 1;
+        puntos = 0;
+        reinicio = false;
+        confirmacionBorrado = 0;
+        labelIndicadoresReinicio.setTranslateX(3000);
+        labelIndicadoresReinicio.setTranslateY(3000);
+        labelPuntosFinal.setTranslateX(3000);
+        labelPuntosFinal.setTranslateY(3000);
+        fondo1.setLayoutX(background1PositionX);
+        fondo2.setLayoutX(background2PositionX);
+        groupAvion.setLayoutX(avionPositionX);
+        groupAvion.setLayoutY(avionPositionY);
+        groupMisil1.setLayoutX(misil1PositionX);
+        groupMisil1.setLayoutY(misil1PositionY);
+        groupMisil2.setLayoutX(misil2PositionX);
+        groupMisil2.setLayoutY(misil2PositionY);
+        groupMisil3.setLayoutX(misil3PositionX);
+        groupMisil3.setLayoutY(misil3PositionY);
+        groupCoin.setLayoutX(coinPositionX);
+        groupCoin.setLayoutY(coinPositionY);
+        explosion.setLayoutX(explosionPositionX);
+        explosion.setLayoutY(explosionPositionY);
+        borrarTextos = false;
+        System.out.println("se borran los textos: 156");
+        labelPuntosFinal = new Label("");
+        labelPuntos.setText("");
+        labelPuntos.setText("Coins: "+puntos);
+        labelIndicadoresReinicio.setText("");
+        ////////////////////////////////////////////////////
+    }
     @Override
     
       public void start(Stage stage) throws FileNotFoundException, IOException {
@@ -116,7 +174,7 @@ public class App extends Application {
           stage.show();
           stage.setResizable(false); // BLOQUEAR REESCALADO DE LA VENTANA
           Image fondoImg = new Image(getClass().getResourceAsStream("/images/FondoLejos.png")); // CARGA LA IMAGEN DE FONDO
-          Image avionImg = new Image(getClass().getResourceAsStream("/images/avion.gif")); // CARGA LA IMAGEN AVION
+          Image avionImg = new Image(getClass().getResourceAsStream("/images/avion3.gif")); // CARGA LA IMAGEN AVION
           Image misilImg = new Image(getClass().getResourceAsStream("/images/misil.png")); // CARGA LA IMAGEN MISIL
           Image coinImg = new Image(getClass().getResourceAsStream("/images/coin.gif")); // CARGA LA IMAGEN COIN
           Image explosionImg = new Image(getClass().getResourceAsStream("/images/explosion2.gif")); // CARGA LA IMAGEN EXPLOSION
@@ -419,6 +477,7 @@ public class App extends Application {
                   new KeyFrame(Duration.seconds(0.017), (ActionEvent ae) -> {
                       Shape colisionMisil1 = Shape.intersect(rectAvion, rectMisil1);
                       boolean colisionVaciaMisil1 = colisionMisil1.getBoundsInLocal().isEmpty();
+                      confirmacionBorrado = 1;
                       if(colisionVaciaMisil1 == false){
                           movimientoMisiles.stop();
                           System.out.println("Has chocado con misil1");
@@ -429,7 +488,6 @@ public class App extends Application {
                           groupAvion.setLayoutX(3000);
                           groupAvion.setLayoutY(3000);
                           reinicio = true;
-                          
                       }
                       Shape colisionMisil2 = Shape.intersect(rectAvion, rectMisil2);
                       boolean colisionVaciaMisil2 = colisionMisil2.getBoundsInLocal().isEmpty();
@@ -461,25 +519,13 @@ public class App extends Application {
                       boolean colisionVaciaCoin = colisionCoin.getBoundsInLocal().isEmpty();
                       if(colisionVaciaCoin == false){
                           coinPositionX = -41;
-                          puntos++;
+                          if(coinPositionX == -41){
+                              puntos++;
+                          }
+                          
+                          velocidadMisiles = velocidadMisiles + 0.2;
                           System.out.println("Tienes "+puntos+" puntos");
                           cambiarLabelPuntos();
-                          switch (puntos) {
-                            case 5:
-                                velocidadMisiles = 2;
-                                System.out.println("nueva velocidad: "+velocidadMisiles);
-                                break;
-                            case 10:
-                                velocidadMisiles = 3;
-                                System.out.println("nueva velocidad: "+velocidadMisiles);
-                                break;
-                            case 15:
-                                velocidadMisiles = 4;
-                                System.out.println("nueva velocidad: "+velocidadMisiles);
-                                break;
-                            default:
-                                break;
-                          }
                       }
                       
                   })
@@ -488,10 +534,9 @@ public class App extends Application {
           detectarColision.setCycleCount(Timeline.INDEFINITE); // DEFINIR QUE SE EJECUTE INDEFINIDAMENTE
           detectarColision.play(); // EJECUTAR EL TIMELINE
           
-          Timeline detectarReinicio = new Timeline(
+          Timeline pantallaPerder = new Timeline(
                   new KeyFrame(Duration.seconds(1.455), (ActionEvent ae) -> {
                       if(reinicio == true){
-                          detectarColision.stop();
                           explosion.setLayoutX(5000);
                           explosion.setLayoutY(5000);
                           groupMisil1.setLayoutX(3000);
@@ -503,26 +548,56 @@ public class App extends Application {
                           groupCoin.setLayoutX(3000);
                           groupCoin.setLayoutY(3000);
                           labelPuntos.setText("");
-                          crearLabelPuntosFinal();
-                          scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-                          @Override
-                          public void handle(KeyEvent event) {
-                              switch (event.getCode()){
-                                  case ENTER: // PULSAR TECLA ENTER
-                                      System.out.println("PULSAS ENTER ");
-                                      break;
-                                  case ESCAPE: // PULSAR TECLA ESCAPE
-                                      System.out.println("PULSAS ESCAPE");
-                                      break;
-                              }
+                          detectarColision.stop();
+                          if(confirmacionBorrado == 1){
+                              confirmacionBorrado = 0;
+                              crearLabelPuntosFinal();
+                              System.out.println("se escriben los textos: 543");
+                              labelIndicadoresReinicio.setText("Pulsa ENTER para jugar otra vez, o pulsa ESC para salir");
+                              Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 18);
+                              labelIndicadoresReinicio.setFont(font);
+                              labelIndicadoresReinicio.setTextFill(Color.GREY);
+                              labelIndicadoresReinicio.setTranslateX(80);
+                              labelIndicadoresReinicio.setTranslateY(180);
+                              root.getChildren().add(labelIndicadoresReinicio);
                           }
-                      });
                       }
                   })
           );
           
+          pantallaPerder.setCycleCount(Timeline.INDEFINITE); // DEFINIR QUE SE EJECUTE INDEFINIDAMENTE
+          pantallaPerder.play(); // EJECUTAR EL TIMELINE
+          
+          Timeline detectarReinicio = new Timeline(
+                  new KeyFrame(Duration.seconds(0.017), (ActionEvent ae) -> {
+                      if (reinicio==true){
+                          scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                            @Override
+                            public void handle(KeyEvent event) {
+                                switch (event.getCode()){
+                                    case ENTER: // PULSAR TECLA ENTER
+                                        System.out.println("PULSAS ENTER ");
+                                        reinicio = false;
+                                        borrarTextos = true;
+                                        reiniciarPartida();
+                                        movimientoMisiles.play();
+                                        detectarColision.play();
+                                        break;
+                                    case ESCAPE: // PULSAR TECLA ESCAPE
+                                        System.out.println("PULSAS ESCAPE");
+                                        System.exit(0);
+                                        break;
+                                }
+                            }
+                         });
+                      }
+                  })
+          );
           detectarReinicio.setCycleCount(Timeline.INDEFINITE); // DEFINIR QUE SE EJECUTE INDEFINIDAMENTE
           detectarReinicio.play(); // EJECUTAR EL TIMELINE
+          
+          
+          
           
       }
       
