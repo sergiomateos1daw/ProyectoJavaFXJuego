@@ -1,17 +1,13 @@
 package es.sergiomateospuerta.proyectojuegosergio;
 
-import java.io.BufferedReader;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -22,14 +18,9 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
 
@@ -54,6 +45,10 @@ public class App extends Application {
     Rectangle rectCoin = new Rectangle(53, 33);
     Group groupCoin = new Group();
     ImageView explosion;
+    Label labelPuntos;
+    Label labelPuntosFinal;
+    //////////////////////////////
+    ///// VARIABLES //////////////
     final int SCENE_TAM_X = 720; // TAMAÑO X DE LA VENTANA
     final int SCENE_TAM_Y = 360; // TAMAÑO Y DE LA VENTANA
     int background1PositionX = 0; // POSICION X DE LA IMAGEN DE FONDO
@@ -80,24 +75,35 @@ public class App extends Application {
     int numAleatorio3 = 0;
     int numAleatorio4 = 0;
     int rondas = 0;
-    double velocidadMisiles = 0.005;
+    int velocidadMisiles = 1;
     int puntos = 0;
     boolean reinicio = false;
-    Label label;
-   
+    //////////////////////////////
+    //////////////////////////////
+    
     private void crearLabelPuntos(){
         
-        label = new Label("Coins: "+puntos);
-        Font font = Font.font("Brush Script MT", FontWeight.BOLD, FontPosture.REGULAR, 25);
-        label.setFont(font);
-        label.setTextFill(Color.BLACK);
-        label.setTranslateX(300);
-        label.setTranslateY(25);
-        root.getChildren().add(label);
+        labelPuntos = new Label("Coins: "+puntos);
+        Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 25);
+        labelPuntos.setFont(font);
+        labelPuntos.setTextFill(Color.BLACK);
+        labelPuntos.setTranslateX(300);
+        labelPuntos.setTranslateY(25);
+        root.getChildren().add(labelPuntos);
+    }
+    private void crearLabelPuntosFinal(){
+        
+        labelPuntosFinal = new Label("HAS CONSEGUIDO "+puntos+" PUNTOS");
+        Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 25);
+        labelPuntosFinal.setFont(font);
+        labelPuntosFinal.setTextFill(Color.BLACK);
+        labelPuntosFinal.setTranslateX(150);
+        labelPuntosFinal.setTranslateY(140);
+        root.getChildren().add(labelPuntosFinal);
     }
     private void cambiarLabelPuntos(){
-        label.setText("");
-        label.setText("Coins: "+puntos);
+        labelPuntos.setText("");
+        labelPuntos.setText("Coins: "+puntos);
     }
     
     @Override
@@ -214,20 +220,20 @@ public class App extends Application {
           movimientoAvion.play(); // EJECUTAR EL TIMELINE
           
           Timeline movimientoMisiles = new Timeline(
-                  new KeyFrame(Duration.seconds(velocidadMisiles), (ActionEvent ae) -> {
-                      misil1PositionX = misil1PositionX -1;
+                  new KeyFrame(Duration.seconds(0.007), (ActionEvent ae) -> {
+                      misil1PositionX = misil1PositionX - velocidadMisiles;
                       groupMisil1.setLayoutX(misil1PositionX);
-                      misil2PositionX = misil2PositionX -1;
+                      misil2PositionX = misil2PositionX - velocidadMisiles;
                       groupMisil2.setLayoutX(misil2PositionX);
-                      misil3PositionX = misil3PositionX -1;
+                      misil3PositionX = misil3PositionX - velocidadMisiles;
                       groupMisil3.setLayoutX(misil3PositionX);
-                      coinPositionX = coinPositionX -1;
+                      coinPositionX = coinPositionX - velocidadMisiles;
                       groupCoin.setLayoutX(coinPositionX);
                       groupMisil1.setLayoutY(misil1PositionY);
                       groupMisil2.setLayoutY(misil2PositionY);
                       groupMisil3.setLayoutY(misil3PositionY);
                       groupCoin.setLayoutY(coinPositionY);
-                      if (misil1PositionX == -40){
+                      if (misil1PositionX < -40){
                           misil1PositionX = 730;
                           numAleatorio1= (int) (Math.random() * 5) + 1;
                           if (numAleatorio1 == 1 && carril1 == false){
@@ -271,7 +277,7 @@ public class App extends Application {
                               carril5 = true;
                           }
                       }
-                      if (misil2PositionX == -40){
+                      if (misil2PositionX < -40){
                           misil2PositionX = 730;
                           numAleatorio2 = (int) (Math.random() * 5) + 1;
                           if (numAleatorio2 == 1 && carril1 == false){
@@ -315,7 +321,7 @@ public class App extends Application {
                               carril5 = true;
                           }
                       }
-                      if (misil3PositionX == -40){
+                      if (misil3PositionX < -40){
                           misil3PositionX = 730;
                           numAleatorio3 = (int) (Math.random() * 5) + 1;
                           if (numAleatorio2 == 1 && carril1 == false){
@@ -458,6 +464,22 @@ public class App extends Application {
                           puntos++;
                           System.out.println("Tienes "+puntos+" puntos");
                           cambiarLabelPuntos();
+                          switch (puntos) {
+                            case 5:
+                                velocidadMisiles = 2;
+                                System.out.println("nueva velocidad: "+velocidadMisiles);
+                                break;
+                            case 10:
+                                velocidadMisiles = 3;
+                                System.out.println("nueva velocidad: "+velocidadMisiles);
+                                break;
+                            case 15:
+                                velocidadMisiles = 4;
+                                System.out.println("nueva velocidad: "+velocidadMisiles);
+                                break;
+                            default:
+                                break;
+                          }
                       }
                       
                   })
@@ -472,6 +494,29 @@ public class App extends Application {
                           detectarColision.stop();
                           explosion.setLayoutX(5000);
                           explosion.setLayoutY(5000);
+                          groupMisil1.setLayoutX(3000);
+                          groupMisil1.setLayoutY(3000);
+                          groupMisil2.setLayoutX(3000);
+                          groupMisil2.setLayoutY(3000);
+                          groupMisil3.setLayoutX(3000);
+                          groupMisil3.setLayoutY(3000);
+                          groupCoin.setLayoutX(3000);
+                          groupCoin.setLayoutY(3000);
+                          labelPuntos.setText("");
+                          crearLabelPuntosFinal();
+                          scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                          @Override
+                          public void handle(KeyEvent event) {
+                              switch (event.getCode()){
+                                  case ENTER: // PULSAR TECLA ENTER
+                                      System.out.println("PULSAS ENTER");
+                                      break;
+                                  case ESCAPE: // PULSAR TECLA ESCAPE
+                                      System.out.println("PULSAS ESCAPE");
+                                      break;
+                              }
+                          }
+                      });
                       }
                   })
           );
