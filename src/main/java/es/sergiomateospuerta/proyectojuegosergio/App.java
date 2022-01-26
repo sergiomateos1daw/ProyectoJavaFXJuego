@@ -506,7 +506,7 @@ public class App extends Application {
                       boolean colisionVaciaMisil3 = colisionMisil3.getBoundsInLocal().isEmpty();
                       if(colisionVaciaMisil3 == false){
                           movimientoMisiles.stop();
-                          System.out.println("Has chocado con misil3");
+                          System.out.println("Has chocado con misil3 ");
                           explosion.setLayoutX(avionPositionX);
                           explosion.setLayoutY(avionPositionY-50);
                           groupMisil3.setLayoutX(3000);
