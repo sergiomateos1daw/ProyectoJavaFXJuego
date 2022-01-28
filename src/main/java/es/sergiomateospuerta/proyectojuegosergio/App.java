@@ -1,5 +1,7 @@
 package es.sergiomateospuerta.proyectojuegosergio;
 
+import java.io.BufferedReader;
+import java.io.File;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -21,8 +23,14 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-
+import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Scanner;
+import javafx.scene.media.AudioClip;
 
 public class App extends Application {
   
@@ -47,7 +55,9 @@ public class App extends Application {
     ImageView explosion;
     Label labelPuntos;
     Label labelPuntosFinal;
+    Label labelPuntosRecord;
     Label labelIndicadoresReinicio;
+
     
     //////////////////////////////
     ///// VARIABLES //////////////
@@ -82,9 +92,14 @@ public class App extends Application {
     boolean reinicio = false;
     boolean borrarTextos = false;
     int confirmacionBorrado = 0;
+    int record = 0;
+    URL urlAudioCoin = getClass().getResource("/audio/coin.wav");
+    URL urlAudioDeath = getClass().getResource("/audio/death_sound.wav");
     
     //////////////////////////////
     //////////////////////////////
+    
+    
     
     private void crearLabelPuntos(){
         labelIndicadoresReinicio = new Label("Pulsa ENTER para jugar otra vez, o pulsa ESC para salir");
@@ -97,7 +112,7 @@ public class App extends Application {
         root.getChildren().add(labelPuntos);
     }
     private void crearLabelPuntosFinal(){
-        
+        labelPuntosRecord = new Label("RÉCORD: "+record+" PUNTOS");
         labelPuntosFinal = new Label("HAS CONSEGUIDO "+puntos+" PUNTOS");
         Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 25);
         labelPuntosFinal.setFont(font);
@@ -106,11 +121,82 @@ public class App extends Application {
         labelPuntosFinal.setTranslateY(140);
         root.getChildren().add(labelPuntosFinal);
     }
+    private void crearLabelPuntosRecord(){
+        
+        labelPuntosRecord = new Label("RÉCORD: "+record+" PUNTOS");
+        Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 20);
+        labelPuntosRecord.setFont(font);
+        labelPuntosRecord.setTextFill(Color.BLACK);
+        labelPuntosRecord.setTranslateX(230);
+        labelPuntosRecord.setTranslateY(220);
+        root.getChildren().add(labelPuntosRecord);
+    }
     private void cambiarLabelPuntos(){
         labelPuntos.setText("");
         labelPuntos.setText("Coins: "+puntos);
     }
+    
+    private void sonidoCoin(){
+        AudioClip audioClip1;
+        try {
+            audioClip1 = new AudioClip(urlAudioCoin.toURI().toString());
+            audioClip1.play();
+        } catch (URISyntaxException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    private void sonidoDeath(){
+        AudioClip audioClip2;
+        try {
+            audioClip2 = new AudioClip(urlAudioDeath.toURI().toString());
+            audioClip2.play();
+        } catch (URISyntaxException ex) {
+            ex.printStackTrace();
+            
+        }
+    }
+   
+    private void writeFile()
+    {
+        FileWriter fichero = null;
+        PrintWriter pw = null;
+        try
+        {
+            fichero = new FileWriter("files/texto.txt");
+            pw = new PrintWriter(fichero);
+            pw.println(puntos);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+           try {
+           // Nuevamente aprovechamos el finally para 
+           // asegurarnos que se cierra el fichero.
+           if (null != fichero)
+              fichero.close();
+           } catch (Exception e2) {
+              e2.printStackTrace();
+           }
+        }
+    }
+   
+    private void readFile(){
+       try (BufferedReader reader = new BufferedReader(new FileReader(new File("files/texto.txt")))) {
+            String line;
+            while ((line = reader.readLine()) != null)
+            record = Integer.parseInt(line);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    } 
+    
+    
+    
    private void reiniciarPartida(){
+        if(puntos > record){
+            writeFile(); 
+        }
         // ESTABLECE A CADA VARIABLE SU VALOR POR DEFECTO //
         avionPositionX = 50;
         avionPositionY = 150;
@@ -142,6 +228,8 @@ public class App extends Application {
         labelIndicadoresReinicio.setTranslateY(3000);
         labelPuntosFinal.setTranslateX(3000);
         labelPuntosFinal.setTranslateY(3000);
+        labelPuntosRecord.setTranslateX(3000);
+        labelPuntosRecord.setTranslateY(3000);
         fondo1.setLayoutX(background1PositionX);
         fondo2.setLayoutX(background2PositionX);
         groupAvion.setLayoutX(avionPositionX);
@@ -159,6 +247,7 @@ public class App extends Application {
         borrarTextos = false;
         System.out.println("se borran los textos: 156");
         labelPuntosFinal = new Label("");
+        labelPuntosRecord = new Label("");
         labelPuntos.setText("");
         labelPuntos.setText("Coins: "+puntos);
         labelIndicadoresReinicio.setText("");
@@ -167,12 +256,24 @@ public class App extends Application {
     @Override
     
       public void start(Stage stage) throws FileNotFoundException, IOException {
-          
+          readFile();
           Scene scene = new Scene(root, SCENE_TAM_X, SCENE_TAM_Y);
           stage.setTitle("Juego Sergio"); // TITULO DE LA VENTANA
           stage.setScene(scene);
           stage.show();
           stage.setResizable(false); // BLOQUEAR REESCALADO DE LA VENTANA
+          AudioClip audioClip1;
+          try {
+            audioClip1 = new AudioClip(urlAudioCoin.toURI().toString());
+          } catch (URISyntaxException ex) {
+            ex.printStackTrace();
+          }
+          AudioClip audioClip2;
+          try {
+            audioClip1 = new AudioClip(urlAudioDeath.toURI().toString());
+          } catch (URISyntaxException ex) {
+            ex.printStackTrace();
+          }
           Image fondoImg = new Image(getClass().getResourceAsStream("/images/FondoLejos.png")); // CARGA LA IMAGEN DE FONDO
           Image avionImg = new Image(getClass().getResourceAsStream("/images/avion3.gif")); // CARGA LA IMAGEN AVION
           Image misilImg = new Image(getClass().getResourceAsStream("/images/misil.png")); // CARGA LA IMAGEN MISIL
@@ -480,6 +581,7 @@ public class App extends Application {
                       confirmacionBorrado = 1;
                       if(colisionVaciaMisil1 == false){
                           movimientoMisiles.stop();
+                          sonidoDeath();
                           System.out.println("Has chocado con misil1");
                           explosion.setLayoutX(avionPositionX);
                           explosion.setLayoutY(avionPositionY-50);
@@ -493,6 +595,7 @@ public class App extends Application {
                       boolean colisionVaciaMisil2 = colisionMisil2.getBoundsInLocal().isEmpty();
                       if(colisionVaciaMisil2 == false){
                           movimientoMisiles.stop();
+                          sonidoDeath();
                           System.out.println("Has chocado con misil2");
                           explosion.setLayoutX(avionPositionX);
                           explosion.setLayoutY(avionPositionY-50);
@@ -506,6 +609,7 @@ public class App extends Application {
                       boolean colisionVaciaMisil3 = colisionMisil3.getBoundsInLocal().isEmpty();
                       if(colisionVaciaMisil3 == false){
                           movimientoMisiles.stop();
+                          sonidoDeath();
                           System.out.println("Has chocado con misil3 ");
                           explosion.setLayoutX(avionPositionX);
                           explosion.setLayoutY(avionPositionY-50);
@@ -521,8 +625,8 @@ public class App extends Application {
                           coinPositionX = -41;
                           if(coinPositionX == -41){
                               puntos++;
+                              sonidoCoin();
                           }
-                          
                           velocidadMisiles = velocidadMisiles + 0.2;
                           System.out.println("Tienes "+puntos+" puntos");
                           cambiarLabelPuntos();
@@ -552,6 +656,10 @@ public class App extends Application {
                           if(confirmacionBorrado == 1){
                               confirmacionBorrado = 0;
                               crearLabelPuntosFinal();
+                              crearLabelPuntosRecord();
+                              readFile();
+                              labelPuntosRecord.setText("RÉCORD: "+record+" PUNTOS");
+                              labelPuntosFinal.setText("HAS CONSEGUIDO "+puntos+" PUNTOS");
                               System.out.println("se escriben los textos: 543");
                               labelIndicadoresReinicio.setText("Pulsa ENTER para jugar otra vez, o pulsa ESC para salir");
                               Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 18);
@@ -584,6 +692,7 @@ public class App extends Application {
                                         detectarColision.play();
                                         break;
                                     case ESCAPE: // PULSAR TECLA ESCAPE
+                                        writeFile();
                                         System.out.println("PULSAS ESCAPE");
                                         System.exit(0);
                                         break;
