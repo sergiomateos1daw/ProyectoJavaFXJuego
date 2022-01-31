@@ -140,6 +140,7 @@ public class App extends Application {
         AudioClip audioClip3;
         try {
             audioClip3 = new AudioClip(urlAudioBackground.toURI().toString());
+            audioClip3.stop();
             audioClip3.play();
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
@@ -274,18 +275,6 @@ public class App extends Application {
           stage.setScene(scene);
           stage.show();
           stage.setResizable(false); // BLOQUEAR REESCALADO DE LA VENTANA
-          AudioClip audioClip1;
-          try {
-            audioClip1 = new AudioClip(urlAudioCoin.toURI().toString());
-          } catch (URISyntaxException ex) {
-            ex.printStackTrace();
-          }
-          AudioClip audioClip2;
-          try {
-            audioClip1 = new AudioClip(urlAudioDeath.toURI().toString());
-          } catch (URISyntaxException ex) {
-            ex.printStackTrace();
-          }
           Image fondoImg = new Image(getClass().getResourceAsStream("/images/FondoLejos.png")); // CARGA LA IMAGEN DE FONDO
           Image avionImg = new Image(getClass().getResourceAsStream("/images/avion3.gif")); // CARGA LA IMAGEN AVION
           Image misilImg = new Image(getClass().getResourceAsStream("/images/misil.png")); // CARGA LA IMAGEN MISIL
