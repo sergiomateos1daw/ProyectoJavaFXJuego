@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Scanner;
 import javafx.scene.media.AudioClip;
 
 public class App extends Application {
@@ -95,6 +94,7 @@ public class App extends Application {
     int record = 0;
     URL urlAudioCoin = getClass().getResource("/audio/coin.wav");
     URL urlAudioDeath = getClass().getResource("/audio/death_sound.wav");
+    URL urlAudioBackground = getClass().getResource("/audio/sound_background.mp3");
     
     //////////////////////////////
     //////////////////////////////
@@ -136,6 +136,16 @@ public class App extends Application {
         labelPuntos.setText("Coins: "+puntos);
     }
     
+    private void sonidoBackground(){
+        AudioClip audioClip3;
+        try {
+            audioClip3 = new AudioClip(urlAudioBackground.toURI().toString());
+            audioClip3.play();
+        } catch (URISyntaxException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
     private void sonidoCoin(){
         AudioClip audioClip1;
         try {
@@ -163,7 +173,7 @@ public class App extends Application {
         PrintWriter pw = null;
         try
         {
-            fichero = new FileWriter("files/texto.txt");
+            fichero = new FileWriter("files/record.txt");
             pw = new PrintWriter(fichero);
             pw.println(puntos);
 
@@ -182,7 +192,7 @@ public class App extends Application {
     }
    
     private void readFile(){
-       try (BufferedReader reader = new BufferedReader(new FileReader(new File("files/texto.txt")))) {
+       try (BufferedReader reader = new BufferedReader(new FileReader(new File("files/record.txt")))) {
             String line;
             while ((line = reader.readLine()) != null)
             record = Integer.parseInt(line);
@@ -194,6 +204,7 @@ public class App extends Application {
     
     
    private void reiniciarPartida(){
+       sonidoBackground();
         if(puntos > record){
             writeFile(); 
         }
@@ -257,6 +268,7 @@ public class App extends Application {
     
       public void start(Stage stage) throws FileNotFoundException, IOException {
           readFile();
+          sonidoBackground();
           Scene scene = new Scene(root, SCENE_TAM_X, SCENE_TAM_Y);
           stage.setTitle("Juego Sergio"); // TITULO DE LA VENTANA
           stage.setScene(scene);
@@ -581,7 +593,9 @@ public class App extends Application {
                       confirmacionBorrado = 1;
                       if(colisionVaciaMisil1 == false){
                           movimientoMisiles.stop();
-                          sonidoDeath();
+                          if(misil1PositionX != avionPositionX){
+                              sonidoDeath();
+                          }
                           System.out.println("Has chocado con misil1");
                           explosion.setLayoutX(avionPositionX);
                           explosion.setLayoutY(avionPositionY-50);
@@ -595,7 +609,9 @@ public class App extends Application {
                       boolean colisionVaciaMisil2 = colisionMisil2.getBoundsInLocal().isEmpty();
                       if(colisionVaciaMisil2 == false){
                           movimientoMisiles.stop();
-                          sonidoDeath();
+                          if(misil2PositionX != avionPositionX){
+                              sonidoDeath();
+                          }
                           System.out.println("Has chocado con misil2");
                           explosion.setLayoutX(avionPositionX);
                           explosion.setLayoutY(avionPositionY-50);
@@ -609,7 +625,9 @@ public class App extends Application {
                       boolean colisionVaciaMisil3 = colisionMisil3.getBoundsInLocal().isEmpty();
                       if(colisionVaciaMisil3 == false){
                           movimientoMisiles.stop();
-                          sonidoDeath();
+                          if(misil3PositionX != avionPositionX){
+                              sonidoDeath();
+                          }
                           System.out.println("Has chocado con misil3 ");
                           explosion.setLayoutX(avionPositionX);
                           explosion.setLayoutY(avionPositionY-50);
@@ -692,8 +710,10 @@ public class App extends Application {
                                         detectarColision.play();
                                         break;
                                     case ESCAPE: // PULSAR TECLA ESCAPE
-                                        writeFile();
                                         System.out.println("PULSAS ESCAPE");
+                                        if(puntos > record){
+                                            writeFile(); 
+                                        }
                                         System.exit(0);
                                         break;
                                 }
