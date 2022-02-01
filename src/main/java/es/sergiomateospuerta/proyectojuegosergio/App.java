@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.media.AudioClip;
 
 public class App extends Application {
@@ -57,9 +59,10 @@ public class App extends Application {
     Label labelPuntosRecord;
     Label labelIndicadoresReinicio;
 
-    
     //////////////////////////////
     ///// VARIABLES //////////////
+    //////////////////////////////
+    
     final int SCENE_TAM_X = 720; // TAMAÑO X DE LA VENTANA
     final int SCENE_TAM_Y = 360; // TAMAÑO Y DE LA VENTANA
     double background1PositionX = 0; // POSICION X DE LA IMAGEN DE FONDO
@@ -91,15 +94,17 @@ public class App extends Application {
     boolean reinicio = false;
     boolean borrarTextos = false;
     int confirmacionBorrado = 0;
-    int record = 0;
+    final int volumenMusicaFondo = 10;
+    boolean sonidoDeath = true;
+    String usuarioActual = "";
+    String usuarioRecord = "";
+    //int record = readFile("files/record.txt");
     URL urlAudioCoin = getClass().getResource("/audio/coin.wav");
     URL urlAudioDeath = getClass().getResource("/audio/death_sound.wav");
     URL urlAudioBackground = getClass().getResource("/audio/sound_background.mp3");
     
-    //////////////////////////////
-    //////////////////////////////
-    
-    
+    ////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////
     
     private void crearLabelPuntos(){
         labelIndicadoresReinicio = new Label("Pulsa ENTER para jugar otra vez, o pulsa ESC para salir");
@@ -112,7 +117,6 @@ public class App extends Application {
         root.getChildren().add(labelPuntos);
     }
     private void crearLabelPuntosFinal(){
-        labelPuntosRecord = new Label("RÉCORD: "+record+" PUNTOS");
         labelPuntosFinal = new Label("HAS CONSEGUIDO "+puntos+" PUNTOS");
         Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 25);
         labelPuntosFinal.setFont(font);
@@ -122,12 +126,11 @@ public class App extends Application {
         root.getChildren().add(labelPuntosFinal);
     }
     private void crearLabelPuntosRecord(){
-        
-        labelPuntosRecord = new Label("RÉCORD: "+record+" PUNTOS");
+        labelPuntosRecord = new Label("RÉCORD: "+readFileString("files/usuarioRecord.txt")+" "+readFileInt("files/record.txt")+" PUNTOS");
         Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 20);
         labelPuntosRecord.setFont(font);
         labelPuntosRecord.setTextFill(Color.BLACK);
-        labelPuntosRecord.setTranslateX(230);
+        labelPuntosRecord.setTranslateX(205);
         labelPuntosRecord.setTranslateY(220);
         root.getChildren().add(labelPuntosRecord);
     }
@@ -145,6 +148,7 @@ public class App extends Application {
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
         }
+        
     }
     
     private void sonidoCoin(){
@@ -158,6 +162,7 @@ public class App extends Application {
     }
     
     private void sonidoDeath(){
+        System.out.println("se reproduce sonidoDeath();");
         AudioClip audioClip2;
         try {
             audioClip2 = new AudioClip(urlAudioDeath.toURI().toString());
@@ -168,7 +173,7 @@ public class App extends Application {
         }
     }
    
-    private void writeFile()
+    private void writeFileRecord()
     {
         FileWriter fichero = null;
         PrintWriter pw = null;
@@ -188,26 +193,86 @@ public class App extends Application {
               fichero.close();
            } catch (Exception e2) {
               e2.printStackTrace();
+              
            }
         }
     }
-   
-    private void readFile(){
-       try (BufferedReader reader = new BufferedReader(new FileReader(new File("files/record.txt")))) {
+    
+    private void writeFileUsuario()
+    {
+        FileWriter fichero = null;
+        PrintWriter pw = null;
+        try
+        {
+            fichero = new FileWriter("files/usuarioRecord.txt");
+            pw = new PrintWriter(fichero);
+            pw.println(usuarioActual);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+           try {
+           // Nuevamente aprovechamos el finally para 
+           // asegurarnos que se cierra el fichero.
+           if (null != fichero)
+              fichero.close();
+           } catch (Exception e2) {
+              e2.printStackTrace();
+              
+           }
+        }
+    }
+    
+    
+    private int readFileInt(String ruta){
+       int record = 0;
+       try (BufferedReader reader = new BufferedReader(new FileReader(new File(ruta)))) {
+            
             String line;
-            while ((line = reader.readLine()) != null)
+            line = reader.readLine();
             record = Integer.parseInt(line);
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
-    } 
+        return record;
+    }
     
+    private String readFileString(String ruta){
+       String usuarioLeido = "";
+       try (BufferedReader reader = new BufferedReader(new FileReader(new File(ruta)))) {
+            
+            String line;
+            line = reader.readLine();
+            usuarioLeido = line;
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return usuarioLeido;
+    }
     
+    private void registroNombre(){
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Rocket Boom");
+        dialog.setHeaderText("Introduce tu nombre para guardar tu puntuación");
+        dialog.setContentText("Introduce tu nombre:");
+
+        // Traditional way to get the response value.
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            usuarioActual = result.get();
+        }
+
+        // The Java 8 way to get the response value (with lambda expression).
+        result.ifPresent(name -> System.out.println("Usuario actual: " + name));
+    }
     
    private void reiniciarPartida(){
        sonidoBackground();
-        if(puntos > record){
-            writeFile(); 
+        if(puntos > readFileInt("files/record.txt")){
+            writeFileUsuario();
+            writeFileRecord(); 
         }
         // ESTABLECE A CADA VARIABLE SU VALOR POR DEFECTO //
         avionPositionX = 50;
@@ -235,6 +300,7 @@ public class App extends Application {
         velocidadMisiles = 1;
         puntos = 0;
         reinicio = false;
+        sonidoDeath = true;
         confirmacionBorrado = 0;
         labelIndicadoresReinicio.setTranslateX(3000);
         labelIndicadoresReinicio.setTranslateY(3000);
@@ -257,7 +323,6 @@ public class App extends Application {
         explosion.setLayoutX(explosionPositionX);
         explosion.setLayoutY(explosionPositionY);
         borrarTextos = false;
-        System.out.println("se borran los textos: 156");
         labelPuntosFinal = new Label("");
         labelPuntosRecord = new Label("");
         labelPuntos.setText("");
@@ -265,13 +330,16 @@ public class App extends Application {
         labelIndicadoresReinicio.setText("");
         ////////////////////////////////////////////////////
     }
+   
     @Override
     
       public void start(Stage stage) throws FileNotFoundException, IOException {
-          readFile();
+          registroNombre();
+          readFileInt("files/record.txt");
           sonidoBackground();
           Scene scene = new Scene(root, SCENE_TAM_X, SCENE_TAM_Y);
-          stage.setTitle("Juego Sergio"); // TITULO DE LA VENTANA
+          stage.setTitle("Rocket Boom"); // TITULO DE LA VENTANA
+          stage.getIcons().add(new Image("/images/misil.png"));
           stage.setScene(scene);
           stage.show();
           stage.setResizable(false); // BLOQUEAR REESCALADO DE LA VENTANA
@@ -571,9 +639,9 @@ public class App extends Application {
                       }
                   })
           );
+          
           movimientoMisiles.setCycleCount(Timeline.INDEFINITE); // DEFINIR QUE SE EJECUTE INDEFINIDAMENTE
           movimientoMisiles.play(); // EJECUTAR EL TIMELINE
-          
           
           Timeline detectarColision = new Timeline(
                   new KeyFrame(Duration.seconds(0.017), (ActionEvent ae) -> {
@@ -582,10 +650,10 @@ public class App extends Application {
                       confirmacionBorrado = 1;
                       if(colisionVaciaMisil1 == false){
                           movimientoMisiles.stop();
-                          if(misil1PositionX != avionPositionX){
+                          if(sonidoDeath == true){
                               sonidoDeath();
+                              sonidoDeath = false;
                           }
-                          System.out.println("Has chocado con misil1");
                           explosion.setLayoutX(avionPositionX);
                           explosion.setLayoutY(avionPositionY-50);
                           groupMisil1.setLayoutX(3000);
@@ -598,10 +666,10 @@ public class App extends Application {
                       boolean colisionVaciaMisil2 = colisionMisil2.getBoundsInLocal().isEmpty();
                       if(colisionVaciaMisil2 == false){
                           movimientoMisiles.stop();
-                          if(misil2PositionX != avionPositionX){
+                          if(sonidoDeath == true){
                               sonidoDeath();
+                              sonidoDeath = false;
                           }
-                          System.out.println("Has chocado con misil2");
                           explosion.setLayoutX(avionPositionX);
                           explosion.setLayoutY(avionPositionY-50);
                           groupMisil2.setLayoutX(3000);
@@ -614,10 +682,10 @@ public class App extends Application {
                       boolean colisionVaciaMisil3 = colisionMisil3.getBoundsInLocal().isEmpty();
                       if(colisionVaciaMisil3 == false){
                           movimientoMisiles.stop();
-                          if(misil3PositionX != avionPositionX){
+                          if(sonidoDeath == true){
                               sonidoDeath();
+                              sonidoDeath = false;
                           }
-                          System.out.println("Has chocado con misil3 ");
                           explosion.setLayoutX(avionPositionX);
                           explosion.setLayoutY(avionPositionY-50);
                           groupMisil3.setLayoutX(3000);
@@ -635,10 +703,8 @@ public class App extends Application {
                               sonidoCoin();
                           }
                           velocidadMisiles = velocidadMisiles + 0.2;
-                          System.out.println("Tienes "+puntos+" puntos");
                           cambiarLabelPuntos();
                       }
-                      
                   })
           );
           
@@ -664,10 +730,10 @@ public class App extends Application {
                               confirmacionBorrado = 0;
                               crearLabelPuntosFinal();
                               crearLabelPuntosRecord();
-                              readFile();
-                              labelPuntosRecord.setText("RÉCORD: "+record+" PUNTOS");
+                              readFileInt("files/record.txt");
+                              readFileString("files/usuarioRecord.txt");
+                              //labelPuntosRecord = new Label("RÉCORD: "+readFileString("files/usuarioRecord.txt")+" "+readFileInt("files/record.txt")+" PUNTOS");
                               labelPuntosFinal.setText("HAS CONSEGUIDO "+puntos+" PUNTOS");
-                              System.out.println("se escriben los textos: 543");
                               labelIndicadoresReinicio.setText("Pulsa ENTER para jugar otra vez, o pulsa ESC para salir");
                               Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 18);
                               labelIndicadoresReinicio.setFont(font);
@@ -691,7 +757,6 @@ public class App extends Application {
                             public void handle(KeyEvent event) {
                                 switch (event.getCode()){
                                     case ENTER: // PULSAR TECLA ENTER
-                                        System.out.println("PULSAS ENTER ");
                                         reinicio = false;
                                         borrarTextos = true;
                                         reiniciarPartida();
@@ -699,9 +764,9 @@ public class App extends Application {
                                         detectarColision.play();
                                         break;
                                     case ESCAPE: // PULSAR TECLA ESCAPE
-                                        System.out.println("PULSAS ESCAPE");
-                                        if(puntos > record){
-                                            writeFile(); 
+                                        if(puntos > readFileInt("files/record.txt")){
+                                            writeFileRecord();
+                                            writeFileUsuario();
                                         }
                                         System.exit(0);
                                         break;
@@ -713,10 +778,5 @@ public class App extends Application {
           );
           detectarReinicio.setCycleCount(Timeline.INDEFINITE); // DEFINIR QUE SE EJECUTE INDEFINIDAMENTE
           detectarReinicio.play(); // EJECUTAR EL TIMELINE
-          
-          
-          
-          
       }
-      
 }
