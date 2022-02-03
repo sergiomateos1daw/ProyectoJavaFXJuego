@@ -54,6 +54,7 @@ public class App extends Application {
     Rectangle rectCoin = new Rectangle(53, 33);
     Group groupCoin = new Group();
     ImageView explosion;
+    ImageView note;
     Label labelPuntos;
     Label labelPuntosFinal;
     Label labelPuntosRecord;
@@ -88,14 +89,13 @@ public class App extends Application {
     int numAleatorio2 = 0;
     int numAleatorio3 = 0;
     int numAleatorio4 = 0;
-    int rondas = 0;
     double velocidadMisiles = 1;
     int puntos = 0;
     boolean reinicio = false;
     boolean borrarTextos = false;
     int confirmacionBorrado = 0;
-    final int volumenMusicaFondo = 10;
     boolean sonidoDeath = true;
+    int avionCurrentSpeed = 0;
     String usuarioActual = "";
     String usuarioRecord = "";
     //int record = readFile("files/record.txt");
@@ -254,6 +254,7 @@ public class App extends Application {
     
     private void registroNombre(){
         TextInputDialog dialog = new TextInputDialog("");
+        dialog.setGraphic(note);
         dialog.setTitle("Rocket Boom");
         dialog.setHeaderText("Introduce tu nombre para guardar tu puntuación");
         dialog.setContentText("Introduce tu nombre:");
@@ -296,12 +297,12 @@ public class App extends Application {
         numAleatorio2 = 0;
         numAleatorio3 = 0;
         numAleatorio4 = 0;
-        rondas = 0;
         velocidadMisiles = 1;
         puntos = 0;
         reinicio = false;
         sonidoDeath = true;
         confirmacionBorrado = 0;
+        avionCurrentSpeed = 0;
         labelIndicadoresReinicio.setTranslateX(3000);
         labelIndicadoresReinicio.setTranslateY(3000);
         labelPuntosFinal.setTranslateX(3000);
@@ -334,6 +335,8 @@ public class App extends Application {
     @Override
     
       public void start(Stage stage) throws FileNotFoundException, IOException {
+          Image noteImg = new Image(getClass().getResourceAsStream("/images/note.png")); // CARGA LA IMAGEN NOTE
+          note = new ImageView(noteImg); // CREA EL OBJETO note
           registroNombre();
           readFileInt("files/record.txt");
           sonidoBackground();
@@ -419,28 +422,51 @@ public class App extends Application {
           fondoScroll.setCycleCount(Timeline.INDEFINITE); // DEFINIR QUE SE EJECUTE INDEFINIDAMENTE
           fondoScroll.play(); // EJECUTAR EL TIMELINE
           
+          scene.setOnKeyPressed((KeyEvent event) -> {
+              switch(event.getCode()) {
+                  case UP:
+                      //PULSADA TECLA ARRIBA
+                      System.out.println("pulsas UP");
+                      avionCurrentSpeed = -6;
+                          
+                      break;
+                  case DOWN:
+                      //PULSADA TECLA ABAJO
+                      System.out.println("pulsas down");
+                          avionCurrentSpeed = 6;
+                      break;
+              }
+              if(reinicio==true){
+                  switch (event.getCode()){
+                                    case ENTER: // PULSAR TECLA ENTER
+                                        reinicio = false;
+                                        borrarTextos = true;
+                                        reiniciarPartida();
+                                        break;
+                                    case ESCAPE: // PULSAR TECLA ESCAPE
+                                        if(puntos > readFileInt("files/record.txt")){
+                                            writeFileRecord();
+                                            writeFileUsuario();
+                                        }
+                                        System.exit(0);
+                                        break;
+                                }
+              }
+          });
+          scene.setOnKeyReleased((KeyEvent event) -> {
+              avionCurrentSpeed = 0;
+          });
           Timeline movimientoAvion = new Timeline(
                   new KeyFrame(Duration.seconds(0.017), (ActionEvent ae) -> {
-                      scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-                        @Override
-                        public void handle(KeyEvent event) {
-                            switch (event.getCode()){
-                                case UP: // PULSAR TECLA ARRIBA
-                                    if (avionPositionY > 50){
-                                        avionPositionY = avionPositionY - 50;
-                                        groupAvion.setLayoutY(avionPositionY);
-                                    }
-                                    break;
-                                case DOWN: // PULSAR TECLA ABAJO
-                                    if (avionPositionY < 250){
-                                        avionPositionY = avionPositionY + 50;
-                                        groupAvion.setLayoutY(avionPositionY);
-                                    }
-                                    break;
-                            }
-                        }
-                      });
-                      
+                      avionPositionY += avionCurrentSpeed;
+                      if(avionPositionY < 0){
+                          avionPositionY = 0;
+                      } else{
+                          if(avionPositionY > 300){
+                              avionPositionY = 300;
+                          }
+                      }
+                      groupAvion.setLayoutY(avionPositionY);
                   })
           );
           
@@ -751,32 +777,17 @@ public class App extends Application {
           
           Timeline detectarReinicio = new Timeline(
                   new KeyFrame(Duration.seconds(0.017), (ActionEvent ae) -> {
-                      if (reinicio==true){
-                          scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-                            @Override
-                            public void handle(KeyEvent event) {
-                                switch (event.getCode()){
-                                    case ENTER: // PULSAR TECLA ENTER
-                                        reinicio = false;
-                                        borrarTextos = true;
-                                        reiniciarPartida();
-                                        movimientoMisiles.play();
-                                        detectarColision.play();
-                                        break;
-                                    case ESCAPE: // PULSAR TECLA ESCAPE
-                                        if(puntos > readFileInt("files/record.txt")){
-                                            writeFileRecord();
-                                            writeFileUsuario();
-                                        }
-                                        System.exit(0);
-                                        break;
-                                }
-                            }
-                         });
+                      if (reinicio==false){
+                          movimientoMisiles.play();
+                          detectarColision.play();
                       }
                   })
           );
           detectarReinicio.setCycleCount(Timeline.INDEFINITE); // DEFINIR QUE SE EJECUTE INDEFINIDAMENTE
           detectarReinicio.play(); // EJECUTAR EL TIMELINE
+      }
+      
+      public static void main(String[] args) {
+          launch();
       }
 }
