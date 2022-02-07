@@ -1,4 +1,19 @@
+/**
+* Juego realizado en JavaFX con Maven
+* El objetivo trata de un avion que tiene que coger monedas
+* mientras esquiva misiles, con cada moneda cogida la
+* dificultad del juego aumenta.
+* 
+* @author  Sergio Mateos
+* @version 1.0
+* @since   2022-02-04
+*/
+
 package es.sergiomateospuerta.proyectojuegosergio;
+
+//////////////////////////////////////////////////////////////
+///////////////     IMPORTACIÓN DE PAQUETES    ///////////////
+//////////////////////////////////////////////////////////////
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,7 +21,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -36,33 +50,35 @@ import javafx.scene.media.AudioClip;
 public class App extends Application {
   
     Pane root = new Pane(); // PANEL PRINCIPAL QUE CONTENDRÁ LOS ELEMENTOS DE LA PANTALLA
-    ImageView fondo1;
-    ImageView fondo2;
-    ImageView avion;
-    Rectangle rectAvion = new Rectangle(53, 33);
+    ImageView fondo1; // AÑADIMOS EL OBJETO FONDO1
+    ImageView fondo2; // AÑADIMOS EL OBJETO FONDO2
+    ImageView avion; // AÑADIMOS EL OBJETO AVION
+    Rectangle rectAvion = new Rectangle(53, 33); //CREAMOS UN RECTANGULO PARA EL OBJETO AVION CON LAS MISMAS DIMENSIONES
     Group groupAvion = new Group();
-    ImageView misil1;
-    Rectangle rectMisil1 = new Rectangle(53, 33);
-    Group groupMisil1 = new Group();
-    ImageView misil2;
-    Rectangle rectMisil2 = new Rectangle(53, 33);
-    Group groupMisil2 = new Group();
-    ImageView misil3;
-    Rectangle rectMisil3 = new Rectangle(53, 33);
-    Group groupMisil3 = new Group();
-    ImageView coin;
-    Rectangle rectCoin = new Rectangle(53, 33);
-    Group groupCoin = new Group();
-    ImageView explosion;
-    ImageView note;
-    Label labelPuntos;
-    Label labelPuntosFinal;
-    Label labelPuntosRecord;
-    Label labelIndicadoresReinicio;
+    ImageView misil1; // AÑADIMOS EL OBJETO MISIL1
+    Rectangle rectMisil1 = new Rectangle(53, 33); //CREAMOS UN RECTANGULO PARA EL OBJETO AVION CON LAS MISMAS DIMENSIONES
+    Group groupMisil1 = new Group(); // CREAMOS UN GRUPO AL QUE POSTERIORMENTE AÑADIREMOS EL OBJETO(LA IMAGEN QUE SE VE EN PANTALLA) Y EL RECTANGULO
+    ImageView misil2; // AÑADIMOS EL OBJETO MISIL2
+    Rectangle rectMisil2 = new Rectangle(53, 33); //CREAMOS UN RECTANGULO PARA EL OBJETO AVION CON LAS MISMAS DIMENSIONES
+    Group groupMisil2 = new Group(); // CREAMOS UN GRUPO AL QUE POSTERIORMENTE AÑADIREMOS EL OBJETO(LA IMAGEN QUE SE VE EN PANTALLA) Y EL RECTANGULO
+    ImageView misil3; // AÑADIMOS EL OBJETO MISIL3
+    Rectangle rectMisil3 = new Rectangle(53, 33); //CREAMOS UN RECTANGULO PARA EL OBJETO AVION CON LAS MISMAS DIMENSIONES
+    Group groupMisil3 = new Group(); // CREAMOS UN GRUPO AL QUE POSTERIORMENTE AÑADIREMOS EL OBJETO(LA IMAGEN QUE SE VE EN PANTALLA) Y EL RECTANGULO
+    ImageView coin; // AÑADIMOS EL OBJETO COIN
+    Rectangle rectCoin = new Rectangle(53, 33); //CREAMOS UN RECTANGULO PARA EL OBJETO AVION CON LAS MISMAS DIMENSIONES
+    Group groupCoin = new Group(); // CREAMOS UN GRUPO AL QUE POSTERIORMENTE AÑADIREMOS EL OBJETO(LA IMAGEN QUE SE VE EN PANTALLA) Y EL RECTANGULO
+    ImageView explosion; // AÑADIMOS EL OBJETO EXPLOSION QUE USAREMOS PARA LA ANIMACION AL SER ELIMINADO (CUANDO TE CHOCAS CON UN MISIL)
+    ImageView note; // AÑADIMOS EL OBJETO NOTE
+    Label labelPuntos; // AÑADIMOS EL OBJETO LABELPUNTOS
+    Label labelPuntosFinal; // AÑADIMOS EL OBJETO LABELPUNTOSFINAL
+    Label labelPuntosRecord; // AÑADIMOS EL OBJETO LABELPUTNOSRECORD
+    Label labelIndicadoresReinicio; // AÑADIMOS EL OBJETO LABELINDICADORESREINICIO
 
     //////////////////////////////
     ///// VARIABLES //////////////
     //////////////////////////////
+    
+    boolean depuracion = true; // CON ESTA VARIABLE ACTIVAMOS O DESACTIVAMOS LA DEPURACION DE CODIGO
     
     final int SCENE_TAM_X = 720; // TAMAÑO X DE LA VENTANA
     final int SCENE_TAM_Y = 360; // TAMAÑO Y DE LA VENTANA
@@ -85,61 +101,75 @@ public class App extends Application {
     boolean carril3 = true; // Y = 150
     boolean carril4 = false; // Y = 200
     boolean carril5 = true; // Y = 250
-    int numAleatorio1 = 0;
-    int numAleatorio2 = 0;
-    int numAleatorio3 = 0;
-    int numAleatorio4 = 0;
-    double velocidadMisiles = 1;
-    int puntos = 0;
-    boolean reinicio = false;
-    boolean borrarTextos = false;
-    int confirmacionBorrado = 0;
-    boolean sonidoDeath = true;
-    int avionCurrentSpeed = 0;
-    String usuarioActual = "";
-    String usuarioRecord = "";
-    //int record = readFile("files/record.txt");
-    URL urlAudioCoin = getClass().getResource("/audio/coin.wav");
-    URL urlAudioDeath = getClass().getResource("/audio/death_sound.wav");
-    URL urlAudioBackground = getClass().getResource("/audio/sound_background.mp3");
+    int numAleatorio1 = 0; // POSTERIORMETE ALMACENAREMOS UN VALOR ALEATORIO ENTRE 1 Y 5
+    int numAleatorio2 = 0; // POSTERIORMETE ALMACENAREMOS UN VALOR ALEATORIO ENTRE 1 Y 5
+    int numAleatorio3 = 0; // POSTERIORMETE ALMACENAREMOS UN VALOR ALEATORIO ENTRE 1 Y 5
+    int numAleatorio4 = 0; // POSTERIORMETE ALMACENAREMOS UN VALOR ALEATORIO ENTRE 1 Y 5
+    double velocidadMisiles = 1; // VELOCIDAD A LA QUE SE MUEVEN LOS MISILES
+    int puntos = 0; // PUNTOS QUE SE OBTIENEB AL COGER UNA MONEDA
+    boolean reinicio = false; // ALMACENA TRUE O FALSE PARA CONTROLAR EL CORRECTO FUNCIONAMIENTO DEL METODO DE REINICIO DE PARTIDA(LO DECLARAMOS MAS TARDE)
+    boolean borrarTextos = false; // ALMACENA TRUE O FALSE PARA CONTROLAR EL BORRADO DE LOS TEXTOS QUE APARECEN EN PANTALLA
+    int confirmacionBorrado = 0; // TAMBIEN LO USAMOS PARA CONTROLAR EL BORRADO DE LOS TEXTOS DE LA PANTALLA
+    boolean sonidoDeath = true; // LO USAMOS PARA CONTROLAR EL CORRECTO FUNCIONAMIENTO DEL SONIDO DE EXPLOSION DE LOS MISILES
+    int avionCurrentSpeed = 0; // USAMOS ESTE VALOR PARA CONTROLAR EL MOVIENTO DEL AVION
+    String usuarioActual = ""; // ALMACENA EL NOMBRE DEL USUARIO QUE ESTA JUGANDO DURANTE LA EJECUCION DEL JUEGO
+    String usuarioRecord = ""; // ALMACENA EL NOMBRE DEL USUARIO QUE POSSEE EL RECORD DE PUNTUACION, SE ALMACENA EN UN FICHERO EXTERNO
+    URL urlAudioCoin = getClass().getResource("/audio/coin.wav"); // AÑADIMOS EL FICHERO DE AUDIO QUE SE REPRODUCE CUANDO COGEMOS UNA MONEDA
+    URL urlAudioDeath = getClass().getResource("/audio/death_sound.wav"); // AÑADIMOS EL FICHERO DE AUDIO QUE SE REPRODUCE CUANDO NOS ESTELLAMOS CONTRA UN MISIL
+    URL urlAudioBackground = getClass().getResource("/audio/sound_background.mp3"); // AÑADIMOS EL FICHERO DE AUDIO QUE SE REPRODUCE CUANDO INICIAMOS O REINICIAMOS LAS PARTIDA
     
     ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////
     
-    private void crearLabelPuntos(){
-        labelIndicadoresReinicio = new Label("Pulsa ENTER para jugar otra vez, o pulsa ESC para salir");
-        labelPuntos = new Label("Coins: "+puntos);
-        Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 25);
-        labelPuntos.setFont(font);
-        labelPuntos.setTextFill(Color.BLACK);
-        labelPuntos.setTranslateX(300);
-        labelPuntos.setTranslateY(25);
-        root.getChildren().add(labelPuntos);
+    private void crearLabelPuntos(){ // ESTE METODO CREA LOS TEXTOS QUE VAMOS A VER EN PANTALLA Y NOS DICEN LAS PUNTUACIÓN EN EL JUEGO
+        if(depuracion==true){
+            System.out.println("llamos al metodo crealLabelPutnos()");
+        }
+        labelIndicadoresReinicio = new Label("Pulsa ENTER para jugar otra vez, o pulsa ESC para salir"); // CREAMOS EL TEXTO DE INDICACIONES CUANDO PERDEMOS
+        labelPuntos = new Label("Coins: "+puntos); // ESTO MUESTRA EN PANATALLA LOS PUTNOS ACUTALES
+        Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 25); // ESTABLECEMOS ALGUNAS DE LAS PROPIEDADES DE LA FUENTE DEL TEXTO
+        labelPuntos.setFont(font); // CON ESTO LE APLICAMOS LAS POPIEDADES DE LA FUENTE AL TEXTO
+        labelPuntos.setTextFill(Color.BLACK); // CAMBIA EL COLOR DEL TEXTO A NEGRO
+        labelPuntos.setTranslateX(300); // CAMBIA LAS COORDENADAS X DEL TEXTO
+        labelPuntos.setTranslateY(25); // CAMBIA LAS COORDENADAS Y DEL TEXTO
+        root.getChildren().add(labelPuntos); // AÑADE EL TEXTO LABELPUTNOS AL ROOT
     }
     private void crearLabelPuntosFinal(){
-        labelPuntosFinal = new Label("HAS CONSEGUIDO "+puntos+" PUNTOS");
-        Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 25);
-        labelPuntosFinal.setFont(font);
-        labelPuntosFinal.setTextFill(Color.BLACK);
-        labelPuntosFinal.setTranslateX(150);
-        labelPuntosFinal.setTranslateY(140);
-        root.getChildren().add(labelPuntosFinal);
+        if(depuracion==true){
+            System.out.println("llamamos al metodo crearLabelPuntosFinal()");
+        }
+        labelPuntosFinal = new Label("HAS CONSEGUIDO "+puntos+" PUNTOS"); //ESTO MUESTRA LOS PUNTOS QUE HEMOS CONSEGUIDO A LO LARGO DE LA PARTIDA
+        Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 25); // ESTABLECEMOS ALGUNAS DE LAS PROPIEDADES DE LA FUENTE DEL TEXTO
+        labelPuntosFinal.setFont(font); // CON ESTO LE APLICAMOS LAS POPIEDADES DE LA FUENTE AL TEXTO
+        labelPuntosFinal.setTextFill(Color.BLACK); // CAMBIA EL COLOR DEL TEXTO A NEGRO
+        labelPuntosFinal.setTranslateX(150); // CAMBIA LAS COORDENADAS X DEL TEXTO
+        labelPuntosFinal.setTranslateY(140); // CAMBIA LAS COORDENADAS Y DEL TEXTO
+        root.getChildren().add(labelPuntosFinal); // AÑADE EL TEXTO LABELPUTNOSFINAL AL ROOT
     }
     private void crearLabelPuntosRecord(){
-        labelPuntosRecord = new Label("RÉCORD: "+readFileString("files/usuarioRecord.txt")+" "+readFileInt("files/record.txt")+" PUNTOS");
-        Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 20);
-        labelPuntosRecord.setFont(font);
-        labelPuntosRecord.setTextFill(Color.BLACK);
-        labelPuntosRecord.setTranslateX(205);
-        labelPuntosRecord.setTranslateY(220);
-        root.getChildren().add(labelPuntosRecord);
+        if(depuracion==true){
+            System.out.println("llamamos al metodo crearLabelPuntosRecord()");
+        }
+        labelPuntosRecord = new Label("RÉCORD: "+readFileString("files/usuarioRecord.txt")+" "+readFileInt("files/record.txt")+" PUNTOS"); // CON ESO MOSTRAMOS EL RECORD ACTUAL AL MOMENTO DE PERDER LA PARTIDA
+        Font font = Font.font("Arial Black", FontWeight.BOLD, FontPosture.REGULAR, 20); // ESTABLECEMOS ALGUNAS DE LAS PROPIEDADES DE LA FUENTE DEL TEXTO
+        labelPuntosRecord.setFont(font); // CON ESTO LE APLICAMOS LAS POPIEDADES DE LA FUENTE AL TEXTO
+        labelPuntosRecord.setTextFill(Color.BLACK); // CAMBIA EL COLOR DEL TEXTO A NEGRO
+        labelPuntosRecord.setTranslateX(205); // CAMBIA LAS COORDENADAS X DEL TEXTO
+        labelPuntosRecord.setTranslateY(220); // CAMBIA LAS COORDENADAS Y DEL TEXTO
+        root.getChildren().add(labelPuntosRecord); // AÑADE EL TEXTO LABELPUTNOSRECORD AL ROOT
     }
-    private void cambiarLabelPuntos(){
-        labelPuntos.setText("");
-        labelPuntos.setText("Coins: "+puntos);
+    private void cambiarLabelPuntos(){ // ESTE METODO ACTUALIZA EL LABEL DE PUTNOS QUE SE MUESTRA EN LA PANTALLA DURANTE LA PARTIDA
+        if(depuracion==true){
+            System.out.println("llamamos al metodo cambiarLabelPuntos()");
+        }
+        labelPuntos.setText(""); // PRIMERO BORRAMOS EL TEXTO QUE YA SE ESTABA MOSTRANDO
+        labelPuntos.setText("Coins: "+puntos); // Y ESCRIBIMOS EL TEXTO NUEVO, CON LA PUNTUACION ACTUALIZADA
     }
     
-    private void sonidoBackground(){
+    private void sonidoBackground(){ // ESTE METODO AÑADE EL SONIDO DE FONDO PARA LA PARTIDA
+        if(depuracion==true){
+            System.out.println("llamamos al metodo sonidoBackground()");
+        }
         AudioClip audioClip3;
         try {
             audioClip3 = new AudioClip(urlAudioBackground.toURI().toString());
@@ -151,7 +181,10 @@ public class App extends Application {
         
     }
     
-    private void sonidoCoin(){
+    private void sonidoCoin(){ // ESTE METODO AÑADE EL SONIDO QUE SE REPRODUCE AL COGER UNA MONEDA
+        if(depuracion==true){
+            System.out.println("se reproduce sonidoCoin()");
+        }
         AudioClip audioClip1;
         try {
             audioClip1 = new AudioClip(urlAudioCoin.toURI().toString());
@@ -161,8 +194,10 @@ public class App extends Application {
         }
     }
     
-    private void sonidoDeath(){
-        System.out.println("se reproduce sonidoDeath();");
+    private void sonidoDeath(){ // ESTE METODO AÑADE EL SONIDO QUE SE REPRODUCE AL MOMENTO DE CHOCAR CONTRA UNA MISI
+        if(depuracion==true){
+            System.out.println("se reproduce sonidoDeath()");
+        }
         AudioClip audioClip2;
         try {
             audioClip2 = new AudioClip(urlAudioDeath.toURI().toString());
@@ -173,13 +208,16 @@ public class App extends Application {
         }
     }
    
-    private void writeFileRecord()
+    private void writeFileRecord() // ESTE METODO ALMACENA EL NUMERO DE PUTNOS QUE SE HAN OBTENIDO, SIEMPRE Y CUANDO SE SUPERE EL RECORD ANTERIOR
     {
+        if(depuracion==true){
+            System.out.println("llamamos al metodo WriteFileRecord()");
+        }
         FileWriter fichero = null;
         PrintWriter pw = null;
         try
         {
-            fichero = new FileWriter("files/record.txt");
+            fichero = new FileWriter("files/record.txt"); // ESTA ES LA RUTA EN LA QUE SE ALMACENA LA PUNTUACION
             pw = new PrintWriter(fichero);
             pw.println(puntos);
 
@@ -198,13 +236,16 @@ public class App extends Application {
         }
     }
     
-    private void writeFileUsuario()
+    private void writeFileUsuario()// ESTE METODO ALMACENA EL NOMBRE DEL JUGADOR ACTUAL EN EL FICHERO DE USUARIORECORD, SIEMPRE Y CUANDO SE SUPERE EL RECORD ANTERIOR
     {
+        if(depuracion==true){
+            System.out.println("llamamos al metodo WriteFileUsuaio()");
+        }
         FileWriter fichero = null;
         PrintWriter pw = null;
         try
         {
-            fichero = new FileWriter("files/usuarioRecord.txt");
+            fichero = new FileWriter("files/usuarioRecord.txt"); // ESTA ES LA RUTA EN LA QUE SE ALMACENA EL NOMBRE DEL USUARIO
             pw = new PrintWriter(fichero);
             pw.println(usuarioActual);
 
@@ -212,8 +253,7 @@ public class App extends Application {
             e.printStackTrace();
         } finally {
            try {
-           // Nuevamente aprovechamos el finally para 
-           // asegurarnos que se cierra el fichero.
+           
            if (null != fichero)
               fichero.close();
            } catch (Exception e2) {
@@ -224,7 +264,10 @@ public class App extends Application {
     }
     
     
-    private int readFileInt(String ruta){
+    private int readFileInt(String ruta){ // ESTE METODO LEE Y DEVUELVE EL CONTENIDO DE UN FICHERO, SIEMPRE DEVUELVE UN VALOR DE TIPO INT
+        if(depuracion==true){
+            System.out.println("llamamos al metodo readFileInt()");
+        }
        int record = 0;
        try (BufferedReader reader = new BufferedReader(new FileReader(new File(ruta)))) {
             
@@ -238,7 +281,10 @@ public class App extends Application {
         return record;
     }
     
-    private String readFileString(String ruta){
+    private String readFileString(String ruta){// ESTE METODO LEE Y DEVUELVE EL CONTENIDO DE UN FICHERO, SIEMPRE DEVUELVE UN VALOR DE TIPO STRING
+        if(depuracion==true){
+            System.out.println("llamamos al metodo readFileString()");
+        }
        String usuarioLeido = "";
        try (BufferedReader reader = new BufferedReader(new FileReader(new File(ruta)))) {
             
@@ -252,24 +298,29 @@ public class App extends Application {
         return usuarioLeido;
     }
     
-    private void registroNombre(){
+    private void registroNombre(){ // ESTE METODO LANZA UNA PEQUEÑA VENTANA PARA QUE EL USUARIO INTRODUZCA SU NOMBRE ANTES DE QUE COMIENZE A JUGAR
+        if(depuracion==true){
+            System.out.println("llamamos al metodo registroNombre()");
+        }
         TextInputDialog dialog = new TextInputDialog("");
         dialog.setGraphic(note);
         dialog.setTitle("Rocket Boom");
         dialog.setHeaderText("Introduce tu nombre para guardar tu puntuación");
         dialog.setContentText("Introduce tu nombre:");
 
-        // Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
             usuarioActual = result.get();
         }
-
-        // The Java 8 way to get the response value (with lambda expression).
-        result.ifPresent(name -> System.out.println("Usuario actual: " + name));
+        if(depuracion==true){
+            result.ifPresent(name -> System.out.println("Usuario actual: " + name));
+        }
     }
     
-   private void reiniciarPartida(){
+   private void reiniciarPartida(){ // CON ESTE METODO REINICIAMOS LA PARTIDA DE MANERA QUE TODAS LAS VARIABLES QUE MODIFICAMOS VUELVAN A SU VALOR INICIAL
+       if(depuracion==true){
+            System.out.println("llamamos al metodo reiniciarPartida()");
+        }
        sonidoBackground();
         if(puntos > readFileInt("files/record.txt")){
             writeFileUsuario();
@@ -337,12 +388,12 @@ public class App extends Application {
       public void start(Stage stage) throws FileNotFoundException, IOException {
           Image noteImg = new Image(getClass().getResourceAsStream("/images/note.png")); // CARGA LA IMAGEN NOTE
           note = new ImageView(noteImg); // CREA EL OBJETO note
-          registroNombre();
+          registroNombre(); // LLAMAMOS AL METODO REGISTRONOMBRE() PARA QUE SALGA LA VENTANA NECESARIA PARA QUE EL USUARIO INTRODUZCA SU NOMBRE
           readFileInt("files/record.txt");
-          sonidoBackground();
-          Scene scene = new Scene(root, SCENE_TAM_X, SCENE_TAM_Y);
-          stage.setTitle("Rocket Boom"); // TITULO DE LA VENTANA
-          stage.getIcons().add(new Image("/images/misil.png"));
+          sonidoBackground(); // LLAMAMOS AL METODO SONIDOBACKGROUND() PARA REPRODUCIR EL SONIDO DE FONDO DURANTE LA PARTIDA
+          Scene scene = new Scene(root, SCENE_TAM_X, SCENE_TAM_Y); // CREAMOS LA VENTANA PRINCIPAL DEL JUEGO
+          stage.setTitle("Rocket Boom"); // TITULO DE LA VENTANA // AÑADIMOS EL TITULO A LA VENTAN PRINCIPAL
+          stage.getIcons().add(new Image("/images/misil.png")); // AÑADIMOS EL ICONO A LA VENTANA
           stage.setScene(scene);
           stage.show();
           stage.setResizable(false); // BLOQUEAR REESCALADO DE LA VENTANA
@@ -367,22 +418,22 @@ public class App extends Application {
           root.getChildren().add(groupMisil3); // AÑADE EL OBJETO misil3 A LA PANTALLA
           root.getChildren().add(groupCoin); // AÑADE EL OBJETO coin A LA PANTALLA
           root.getChildren().add(explosion); // AÑADE EL OBJETO explosion A LA PANTALLA
-          groupAvion.getChildren().addAll(avion,rectAvion);
-          groupMisil1.getChildren().addAll(misil1,rectMisil1);
-          groupMisil2.getChildren().addAll(misil2,rectMisil2);
-          groupMisil3.getChildren().addAll(misil3,rectMisil3);
-          groupCoin.getChildren().addAll(coin,rectCoin);
-          rectAvion.setVisible(false);
-          rectMisil1.setVisible(false);
-          rectMisil2.setVisible(false);
-          rectMisil3.setVisible(false);
-          rectCoin.setVisible(false);
+          groupAvion.getChildren().addAll(avion,rectAvion); // AÑADIMOS AL GRUPO LA IMAGEN Y EL RECTANGULO CORRESPONDIENTES
+          groupMisil1.getChildren().addAll(misil1,rectMisil1); // AÑADIMOS AL GRUPO LA IMAGEN Y EL RECTANGULO CORRESPONDIENTES
+          groupMisil2.getChildren().addAll(misil2,rectMisil2); // AÑADIMOS AL GRUPO LA IMAGEN Y EL RECTANGULO CORRESPONDIENTES
+          groupMisil3.getChildren().addAll(misil3,rectMisil3); // AÑADIMOS AL GRUPO LA IMAGEN Y EL RECTANGULO CORRESPONDIENTES
+          groupCoin.getChildren().addAll(coin,rectCoin); // AÑADIMOS AL GRUPO LA IMAGEN Y EL RECTANGULO CORRESPONDIENTES
+          rectAvion.setVisible(false); // CON ESTO HACEMOS QUE NO SE VEA EL RECTANGULO
+          rectMisil1.setVisible(false); // CON ESTO HACEMOS QUE NO SE VEA EL RECTANGULO
+          rectMisil2.setVisible(false); // CON ESTO HACEMOS QUE NO SE VEA EL RECTANGULO
+          rectMisil3.setVisible(false); // CON ESTO HACEMOS QUE NO SE VEA EL RECTANGULO
+          rectCoin.setVisible(false); // CON ESTO HACEMOS QUE NO SE VEA EL RECTANGULO
           
           ////////////////////////////////////////////////////////////
           //////////////////////// LABEL DE PUNTOS ///////////////////
           ////////////////////////////////////////////////////////////
           
-          crearLabelPuntos();
+          crearLabelPuntos(); // LLAMAMOS AL METODO CREARLABELPUTNOS() PARA QUE SE MUESTREN LOS TEXTOS DE PUNTUACION EN LA PANTALLA
           
           ////////////////////////////////////////////////////////////
           // IGUALAMOS LA POSICION INICIAL DE LAS IMAGENES DEL JUEGO //
@@ -405,11 +456,11 @@ public class App extends Application {
           
           ////////////////////////////////////////////////////////////
 
-          Timeline fondoScroll = new Timeline(
+          Timeline fondoScroll = new Timeline( // CON ESTE TIMELINE CONSEGUIMOS EL EFECTO DE SCROLL EN LA IMAGEN DE FONDO USANDO DOS OBJETOS QUE CONTIENEN LA MISMA IMAGEN
                   new KeyFrame(Duration.seconds(0.017), (ActionEvent ae) -> {
-                      background1PositionX = background1PositionX -1;
+                      background1PositionX = background1PositionX -1; // RESTAMOS 1 LA POSICION X DEL FONDO 1
                       fondo1.setLayoutX(background1PositionX);
-                      background2PositionX = background2PositionX -1;
+                      background2PositionX = background2PositionX -1; // RESTAMOS 1 LA POSICION X DEL FONDO 2
                       fondo2.setLayoutX(background2PositionX);
                       if (background1PositionX == -720) {
                           background1PositionX = 720;
@@ -422,31 +473,41 @@ public class App extends Application {
           fondoScroll.setCycleCount(Timeline.INDEFINITE); // DEFINIR QUE SE EJECUTE INDEFINIDAMENTE
           fondoScroll.play(); // EJECUTAR EL TIMELINE
           
-          scene.setOnKeyPressed((KeyEvent event) -> {
+          scene.setOnKeyPressed((KeyEvent event) -> { // CON ESTO DETECTAMOS LA PULSACION DE LAS TECLAS
               switch(event.getCode()) {
                   case UP:
                       //PULSADA TECLA ARRIBA
-                      System.out.println("pulsas UP");
+                      if(depuracion==true){
+                        System.out.println("Pulsas UP");
+                      }
                       avionCurrentSpeed = -6;
                           
                       break;
                   case DOWN:
                       //PULSADA TECLA ABAJO
-                      System.out.println("pulsas down");
-                          avionCurrentSpeed = 6;
+                      if(depuracion==true){
+                        System.out.println("Pulsas DOWN");
+                      }
+                      avionCurrentSpeed = 6;
                       break;
               }
               if(reinicio==true){
                   switch (event.getCode()){
                                     case ENTER: // PULSAR TECLA ENTER
+                                        if(depuracion==true){
+                                            System.out.println("Pulsas ENTER");
+                                        }
                                         reinicio = false;
                                         borrarTextos = true;
-                                        reiniciarPartida();
+                                        reiniciarPartida(); // LLAMAMOS AL METODO DE REINCIO DE PARTIDA
                                         break;
                                     case ESCAPE: // PULSAR TECLA ESCAPE
+                                        if(depuracion==true){
+                                            System.out.println("Pulsas ESCAPE");
+                                        }
                                         if(puntos > readFileInt("files/record.txt")){
-                                            writeFileRecord();
-                                            writeFileUsuario();
+                                            writeFileRecord(); // LLAMAMOS AL METODO DE ESCRITURA DE PUNTUACION EN EL FICHERO DE RECORD
+                                            writeFileUsuario(); // LLAMAMOS AL METODO DE ESCRITURA DE NOMBRE EN EL FICHERO DE NOMBRE DE USUARIO
                                         }
                                         System.exit(0);
                                         break;
@@ -676,6 +737,9 @@ public class App extends Application {
                       confirmacionBorrado = 1;
                       if(colisionVaciaMisil1 == false){
                           movimientoMisiles.stop();
+                          if(depuracion==true){
+                              System.out.println("HAS CHOCADO CON UN MISIL");
+                          }
                           if(sonidoDeath == true){
                               sonidoDeath();
                               sonidoDeath = false;
@@ -692,6 +756,9 @@ public class App extends Application {
                       boolean colisionVaciaMisil2 = colisionMisil2.getBoundsInLocal().isEmpty();
                       if(colisionVaciaMisil2 == false){
                           movimientoMisiles.stop();
+                          if(depuracion==true){
+                              System.out.println("HAS CHOCADO CON UN MISIL");
+                          }
                           if(sonidoDeath == true){
                               sonidoDeath();
                               sonidoDeath = false;
@@ -708,6 +775,9 @@ public class App extends Application {
                       boolean colisionVaciaMisil3 = colisionMisil3.getBoundsInLocal().isEmpty();
                       if(colisionVaciaMisil3 == false){
                           movimientoMisiles.stop();
+                          if(depuracion==true){
+                              System.out.println("HAS CHOCADO CON UN MISIL");
+                          }
                           if(sonidoDeath == true){
                               sonidoDeath();
                               sonidoDeath = false;
@@ -727,6 +797,9 @@ public class App extends Application {
                           if(coinPositionX == -41){
                               puntos++;
                               sonidoCoin();
+                              if(depuracion==true){
+                                System.out.println("HAS COGIDO UNA MONEDA");
+                              }
                           }
                           velocidadMisiles = velocidadMisiles + 0.2;
                           cambiarLabelPuntos();
